@@ -13,10 +13,10 @@ public class Tree {
         String name;
         String parentName;
 
-        Person child;
+        List<Person> child = new ArrayList<>();
 
         public void setChild(Person child) {
-            this.child = child;
+            this.child.add(child);
         }
 
         public Person(String name , String parentName){
@@ -31,18 +31,23 @@ public class Tree {
         Map<String, Person> parameters = new HashMap<>();
         parameters.put("Amir",new Person("Amir" ,"Hesam"));
         parameters.put("Hesam",new Person("Hesam" ,""));
-        parameters.put("Soheyl",new Person("Soheyl" ,""));
+        parameters.put("Soheyl",new Person("Soheyl" ,"Hesam"));
+        parameters.put("Sina",new Person("Sina" ,""));
 
         ObjectMapper objectMapper = new ObjectMapper();
-        for (String key : parameters.keySet()){
-            try{
-                Person p = parameters.get(key);
-                Person parent = parameters.get(p.parentName);
-                parent.setChild(p);
+        List<String> keys = new LinkedList<>(parameters.keySet());
+
+        for (String key : keys){
+
+                Person child = parameters.get(key);
+                Person parent = parameters.get(child.parentName);
+                if (parent == null){
+                    System.out.println(key + " is grand parent");
+                    continue;
+                }
+                parent.setChild(child);
                 parameters.remove(key);
-            }catch (Exception e){
-                System.out.println(key + " is a grand parent");
-            }
+
         }
         Gson gson = new Gson();
         JsonNode jsonNode = objectMapper.readTree(gson.toJson(parameters));
